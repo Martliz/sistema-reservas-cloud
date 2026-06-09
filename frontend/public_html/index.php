@@ -1,8 +1,8 @@
 <?php
-// index.php — Dashboard principal
-require_once 'includes/config.php';
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
+// index.php — Dashboard principal con banner estilo Work Café
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/auth.php';
 
 session_init();
 redirigir_si_no_autenticado();
@@ -10,18 +10,16 @@ redirigir_si_no_autenticado();
 $usuario = usuario_actual();
 $db      = getDB();
 
-// Estadísticas del usuario
 $stmt = $db->prepare("
     SELECT
-      COUNT(*) FILTER (WHERE estado = 'CONFIRMADA')                         AS activas,
-      COUNT(*) FILTER (WHERE estado = 'CANCELADA')                          AS canceladas,
+      COUNT(*) FILTER (WHERE estado = 'CONFIRMADA')                          AS activas,
+      COUNT(*) FILTER (WHERE estado = 'CANCELADA')                           AS canceladas,
       COUNT(*) FILTER (WHERE estado = 'CONFIRMADA' AND fecha_inicio > NOW()) AS proximas
     FROM reservas WHERE usuario_id = ?
 ");
 $stmt->execute([$usuario['id']]);
 $stats = $stmt->fetch();
 
-// Próximas 5 reservas del usuario
 $stmt = $db->prepare("
     SELECT r.id, r.fecha_inicio, r.fecha_fin, r.estado, r.notas,
            rc.nombre AS recurso_nombre
@@ -38,11 +36,16 @@ $pageTitle = 'Dashboard — ' . APP_NAME;
 include 'includes/header.php';
 ?>
 
-<div class="page-header">
-  <h1>Bienvenido, <?= htmlspecialchars($usuario['nombre']) ?> 👋</h1>
-  <a href="/nueva-reserva.php" class="btn btn-primary">+ Nueva reserva</a>
+<!-- Banner de bienvenida estilo Work Café -->
+<div class="welcome-banner">
+  <div>
+    <h1>Bienvenido, <?= htmlspecialchars($usuario['nombre']) ?></h1>
+    <p>Gestiona tus reservas de espacios y recursos en tiempo real.</p>
+  </div>
+  <a href="/nueva-reserva.php" class="btn btn-outline">+ Reservar ahora</a>
 </div>
 
+<!-- Stats -->
 <div class="stats-grid">
   <div class="stat-card">
     <div class="stat-number"><?= (int)$stats['activas'] ?></div>
@@ -50,7 +53,7 @@ include 'includes/header.php';
   </div>
   <div class="stat-card">
     <div class="stat-number"><?= (int)$stats['proximas'] ?></div>
-    <div class="stat-label">Próximas reservas</div>
+    <div class="stat-label">Próximas</div>
   </div>
   <div class="stat-card">
     <div class="stat-number"><?= (int)$stats['canceladas'] ?></div>
@@ -58,13 +61,13 @@ include 'includes/header.php';
   </div>
 </div>
 
+<!-- Próximas reservas -->
 <div class="card">
-  <div class="card-title">📆 Próximas reservas</div>
-
+  <div class="card-title">Próximas reservas</div>
   <?php if (empty($proximas)): ?>
-    <p style="color:var(--gray-400); text-align:center; padding:2rem 0">
+    <p style="color:var(--gris-400);text-align:center;padding:2rem 0">
       No tienes reservas próximas.
-      <a href="/nueva-reserva.php">Crea una ahora</a>
+      <a href="/nueva-reserva.php" style="color:var(--azul);font-weight:600">Reservar ahora →</a>
     </p>
   <?php else: ?>
     <div class="table-wrapper">
@@ -98,7 +101,7 @@ include 'includes/header.php';
       </table>
     </div>
     <div style="margin-top:1rem">
-      <a href="/reservas.php" class="btn btn-outline btn-sm">Ver todas mis reservas →</a>
+      <a href="/reservas.php" class="btn-outline-dark btn btn-sm">Ver todas mis reservas →</a>
     </div>
   <?php endif; ?>
 </div>

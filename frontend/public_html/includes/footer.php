@@ -4,7 +4,7 @@
 </main>
 
 <footer class="footer">
-  <p><?= APP_NAME ?> v<?= APP_VERSION ?> &mdash; Alkemy Cloud Architecture 2025</p>
+  <p>Sistema de Reservas v1.0.0 &mdash; Grupo 1 &mdash; Cloud Architecture 2026</p>
 </footer>
 
 <script src="/assets/js/main.js"></script>
